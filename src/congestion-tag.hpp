@@ -25,7 +25,7 @@ public:
 	CongestionTag(bool congMark)
 		: m_congMark(congMark)
 	{
-
+		
 	}
 
 	void setCongMark(bool m)
