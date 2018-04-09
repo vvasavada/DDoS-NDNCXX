@@ -94,4 +94,6 @@ private:
 
 } // namespace ndn
 
+#include "congestion-tag.hpp"
+
 #endif // NDN_TAG_HPP
