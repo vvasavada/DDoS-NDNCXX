@@ -38,6 +38,7 @@ enum {
   HopCountTag = 84,
   Nack = 800,
   NackReason = 801,
+  NackPrefixLength = 802,
   NextHopFaceId = 816,
   IncomingFaceId = 817,
   CachePolicy = 820,

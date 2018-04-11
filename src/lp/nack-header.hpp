@@ -42,7 +42,7 @@ enum class NackReason {
   NONE = 0,
   CONGESTION = 50,
   DUPLICATE = 100,
-  NO_ROUTE = 150,  
+  NO_ROUTE = 150,
 };
 
 std::ostream&
@@ -91,8 +91,22 @@ public: // reason
   NackHeader&
   setReason(NackReason reason);
 
+  uint64_t
+  getPrefixLen() const;
+
+  /**
+   * \brief set prefix length
+   * \param the length of the prefix
+   *
+   * When a router receives a Nack containing the prefix, the router should handle all
+   * the PIT entries under the prefix of the Interest
+   */
+  NackHeader&
+  setPrefixLen(uint64_t m_prefixLen);
+
 private:
   NackReason m_reason;
+  uint64_t m_prefixLen;
   mutable Block m_wire;
 };
 

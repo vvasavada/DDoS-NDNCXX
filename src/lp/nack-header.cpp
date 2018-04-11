@@ -80,7 +80,10 @@ size_t
 NackHeader::wireEncode(EncodingImpl<TAG>& encoder) const
 {
   size_t length = 0;
-  length += prependNonNegativeIntegerBlock(encoder, tlv::NackReason, static_cast<uint32_t>(m_reason));
+  length += prependNonNegativeIntegerBlock(encoder, tlv::NackPrefixLength,
+                                           m_prefixLen);
+  length += prependNonNegativeIntegerBlock(encoder, tlv::NackReason,
+                                           static_cast<uint32_t>(m_reason));
   length += encoder.prependVarNumber(length);
   length += encoder.prependVarNumber(tlv::Nack);
   return length;
@@ -126,7 +129,16 @@ NackHeader::wireDecode(const Block& wire)
     else {
       BOOST_THROW_EXCEPTION(ndn::tlv::Error("expecting NackReason block"));
     }
+
+    it++;
+    if (it->type() == tlv::NackPrefixLength) {
+      m_prefixLen = readNonNegativeInteger(*it);
+    }
+    else {
+      BOOST_THROW_EXCEPTION(ndn::tlv::Error("expecting prefix length block"));
+    }
   }
+
 }
 
 NackReason
@@ -136,6 +148,8 @@ NackHeader::getReason() const
   case NackReason::CONGESTION:
   case NackReason::DUPLICATE:
   case NackReason::NO_ROUTE:
+  case NackReason::VALID_INTEREST_OVERLOAD:
+  case NackReason::FAKE_INTEREST_OVERLOAD:
     return m_reason;
   default:
     return NackReason::NONE;
@@ -146,6 +160,20 @@ NackHeader&
 NackHeader::setReason(NackReason reason)
 {
   m_reason = reason;
+  m_wire.reset();
+  return *this;
+}
+
+uint64_t
+NackHeader::getPrefixLen() const
+{
+  return m_prefixLen;
+}
+
+NackHeader&
+NackHeader::setPrefixLen(uint64_t prefixLen)
+{
+  m_prefixLen = prefixLen;
   m_wire.reset();
   return *this;
 }
