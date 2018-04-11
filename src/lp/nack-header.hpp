@@ -37,10 +37,12 @@ namespace lp {
  * \brief indicates the reason type of a network NACK
  */
 enum class NackReason {
+  FAKE_INTEREST_OVERLOAD = -100,
+  VALID_INTEREST_OVERLOAD = -50,
   NONE = 0,
   CONGESTION = 50,
   DUPLICATE = 100,
-  NO_ROUTE = 150
+  NO_ROUTE = 150,  
 };
 
 std::ostream&

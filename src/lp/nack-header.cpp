@@ -39,6 +39,12 @@ operator<<(std::ostream& os, NackReason reason)
   case NackReason::NO_ROUTE:
     os << "NoRoute";
     break;
+  case NackReason::VALID_INTEREST_OVERLOAD:
+    os << "Valid Interest Overload";
+    break;
+  case NackReason::FAKE_INTEREST_OVERLOAD:
+    os << "Fake Interest Overload";
+    break;
   default:
     os << "None";
     break;
