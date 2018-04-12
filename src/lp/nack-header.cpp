@@ -67,6 +67,7 @@ isLessSevere(lp::NackReason x, lp::NackReason y)
 
 NackHeader::NackHeader()
   : m_reason(NackReason::NONE)
+  , m_prefixLen(0)
 {
 }
 
