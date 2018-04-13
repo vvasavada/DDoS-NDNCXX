@@ -37,6 +37,7 @@ namespace lp {
  * \brief indicates the reason type of a network NACK
  */
 enum class NackReason {
+  HINT_CHANGE_NOTICE = -150,
   FAKE_INTEREST_OVERLOAD = -100,
   VALID_INTEREST_OVERLOAD = -50,
   NONE = 0,
