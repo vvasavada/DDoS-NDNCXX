@@ -38,9 +38,9 @@ namespace lp {
  * \brief indicates the reason type of a network NACK
  */
 enum class NackReason {
-  HINT_CHANGE_NOTICE = -150,
-  FAKE_INTEREST_OVERLOAD = -100,
-  VALID_INTEREST_OVERLOAD = -50,
+  DDOS_HINT_CHANGE_NOTICE = -150,
+  DDOS_FAKE_INTEREST = -100,
+  DDOS_VALID_INTEREST_OVERLOAD = -50,
   NONE = 0,
   CONGESTION = 50,
   DUPLICATE = 100,
@@ -137,10 +137,9 @@ public:
   uint64_t m_prefixLen;
 
   // used for fake interest attack
-  // control the fake interest percentage to be less than m_expectedPerc
-  // range: 0 - 100
-  // e.g. if value is 5, the expected percentage is 5%
-  uint64_t m_expectedFakePerc;
+  // control the fake interest percentage to be less than m_fakeTolerance
+  // e.g. if value is 50, the tolerance is 50 fake interest per second
+  uint64_t m_fakeTolerance;
 
   // used for fake interest attack
   // contains the list of fake interest name THAT ONLY AFTER THE PREFIX

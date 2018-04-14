@@ -39,13 +39,13 @@ operator<<(std::ostream& os, NackReason reason)
   case NackReason::NO_ROUTE:
     os << "NoRoute";
     break;
-  case NackReason::VALID_INTEREST_OVERLOAD:
+  case NackReason::DDOS_VALID_INTEREST_OVERLOAD:
     os << "Valid Interest Overload";
     break;
-  case NackReason::FAKE_INTEREST_OVERLOAD:
+  case NackReason::DDOS_FAKE_INTEREST:
     os << "Fake Interest Overload";
     break;
-  case NackReason::HINT_CHANGE_NOTICE:
+  case NackReason::DDOS_HINT_CHANGE_NOTICE:
     os << "Forwarding Hint Change Notice";
     break;
   default:
@@ -71,7 +71,7 @@ isLessSevere(lp::NackReason x, lp::NackReason y)
 NackHeader::NackHeader()
   : m_reason(NackReason::NONE)
   , m_prefixLen(0)
-
+  , m_fakeTolerance(0)
 {
 }
 
@@ -90,8 +90,8 @@ NackHeader::wireEncode(EncodingImpl<TAG>& encoder) const
     length += entry.wireEncode(encoder);
   }
 
-  length += prependNonNegativeIntegerBlock(encoder, tlv::NackExpectedFakePerc,
-                                           m_expectedFakePerc);
+  length += prependNonNegativeIntegerBlock(encoder, tlv::NackFakeTolerance,
+                                           m_fakeTolerance);
 
   length += prependNonNegativeIntegerBlock(encoder, tlv::NackPrefixLength,
                                            m_prefixLen);
@@ -154,12 +154,12 @@ NackHeader::wireDecode(const Block& wire)
     m_prefixLen = readNonNegativeInteger(*it);
   }
   else {
-    BOOST_THROW_EXCEPTION(ndn::tlv::Error("expecting prefix length block"));
+    BOOST_THROW_EXCEPTION(ndn::tlv::Error("expecting fake tolerance block"));
   }
 
   it++;
-  if (it->type() == tlv::NackExpectedFakePerc) {
-    m_expectedFakePerc = readNonNegativeInteger(*it);
+  if (it->type() == tlv::NackFakeTolerance) {
+    m_fakeTolerance = readNonNegativeInteger(*it);
   }
   else {
     BOOST_THROW_EXCEPTION(ndn::tlv::Error("expecting expected percentage block"));
@@ -180,9 +180,9 @@ NackHeader::getReason() const
   case NackReason::CONGESTION:
   case NackReason::DUPLICATE:
   case NackReason::NO_ROUTE:
-  case NackReason::VALID_INTEREST_OVERLOAD:
-  case NackReason::FAKE_INTEREST_OVERLOAD:
-  case NackReason::HINT_CHANGE_NOTICE:
+  case NackReason::DDOS_VALID_INTEREST_OVERLOAD:
+  case NackReason::DDOS_FAKE_INTEREST:
+  case NackReason::DDOS_HINT_CHANGE_NOTICE:
     return m_reason;
   default:
     return NackReason::NONE;
