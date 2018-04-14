@@ -137,7 +137,7 @@ NackHeader::wireDecode(const Block& wire)
   m_prefixLen = 0;
 
   if (m_wire.elements_size() <= 0) {
-    BOOST_THROW_EXCEPTION(ndn::tlv::Error("expecting prefix length block"));
+    BOOST_THROW_EXCEPTION(ndn::tlv::Error("expecting blocks"));
   }
 
   Block::element_const_iterator it = m_wire.elements_begin();
@@ -154,7 +154,7 @@ NackHeader::wireDecode(const Block& wire)
     m_prefixLen = readNonNegativeInteger(*it);
   }
   else {
-    BOOST_THROW_EXCEPTION(ndn::tlv::Error("expecting fake tolerance block"));
+    BOOST_THROW_EXCEPTION(ndn::tlv::Error("expecting prefix length block"));
   }
 
   it++;
@@ -162,7 +162,7 @@ NackHeader::wireDecode(const Block& wire)
     m_fakeTolerance = readNonNegativeInteger(*it);
   }
   else {
-    BOOST_THROW_EXCEPTION(ndn::tlv::Error("expecting expected percentage block"));
+    BOOST_THROW_EXCEPTION(ndn::tlv::Error("expecting fake tolerance block"));
   }
 
   it++;
@@ -193,48 +193,6 @@ NackHeader&
 NackHeader::setReason(NackReason reason)
 {
   m_reason = reason;
-  m_wire.reset();
-  return *this;
-}
-
-std::list<Name>
-NackHeader::getFakeInterestNames() const
-{
-  return m_fakeInterestNames;
-}
-
-NackHeader&
-NackHeader::setFakeInterestNames(std::list<Name> m_fakeInterestNames)
-{
-  m_fakeInterestNames = m_fakeInterestNames;
-  m_wire.reset();
-  return *this;
-}
-
-uint64_t
-NackHeader::getExpFakePerc() const
-{
-  return m_expectedFakePerc;
-}
-
-NackHeader&
-NackHeader::setExpFakePerc(uint64_t expFakePerc)
-{
-  m_expectedFakePerc = expFakePerc;
-  m_wire.reset();
-  return *this;
-}
-
-uint64_t
-NackHeader::getPrefixLen() const
-{
-  return m_prefixLen;
-}
-
-NackHeader&
-NackHeader::setPrefixLen(uint64_t prefixLen)
-{
-  m_prefixLen = prefixLen;
   m_wire.reset();
   return *this;
 }
