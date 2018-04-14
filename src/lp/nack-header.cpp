@@ -45,6 +45,9 @@ operator<<(std::ostream& os, NackReason reason)
   case NackReason::FAKE_INTEREST_OVERLOAD:
     os << "Fake Interest Overload";
     break;
+  case NackReason::HINT_CHANGE_NOTICE:
+    os << "Forwarding Hint Change Notice";
+    break;
   default:
     os << "None";
     break;
@@ -81,10 +84,20 @@ size_t
 NackHeader::wireEncode(EncodingImpl<TAG>& encoder) const
 {
   size_t length = 0;
+
+  for (const auto& entry : m_fakeInterestNames) {
+    length += entry.wireEncode(encoder);
+  }
+
+  length += prependNonNegativeIntegerBlock(encoder, tlv::NackExpectedFakePerc,
+                                           m_expectedFakePerc);
+
   length += prependNonNegativeIntegerBlock(encoder, tlv::NackPrefixLength,
                                            m_prefixLen);
+
   length += prependNonNegativeIntegerBlock(encoder, tlv::NackReason,
                                            static_cast<uint32_t>(m_reason));
+
   length += encoder.prependVarNumber(length);
   length += encoder.prependVarNumber(tlv::Nack);
   return length;
@@ -120,24 +133,42 @@ NackHeader::wireDecode(const Block& wire)
   m_wire = wire;
   m_wire.parse();
   m_reason = NackReason::NONE;
+  m_prefixLen = 0;
 
-  if (m_wire.elements_size() > 0) {
-    Block::element_const_iterator it = m_wire.elements_begin();
 
-    if (it->type() == tlv::NackReason) {
-      m_reason = static_cast<NackReason>(readNonNegativeInteger(*it));
-    }
-    else {
-      BOOST_THROW_EXCEPTION(ndn::tlv::Error("expecting NackReason block"));
-    }
+  if (m_wire.elements_size() <= 0) {
+    BOOST_THROW_EXCEPTION(ndn::tlv::Error("expecting prefix length block"));
+  }
 
-    it++;
-    if (it->type() == tlv::NackPrefixLength) {
-      m_prefixLen = readNonNegativeInteger(*it);
-    }
-    else {
-      BOOST_THROW_EXCEPTION(ndn::tlv::Error("expecting prefix length block"));
-    }
+  Block::element_const_iterator it = m_wire.elements_begin();
+
+  if (it->type() == tlv::NackReason) {
+    m_reason = static_cast<NackReason>(readNonNegativeInteger(*it));
+  }
+  else {
+    BOOST_THROW_EXCEPTION(ndn::tlv::Error("expecting NackReason block"));
+  }
+
+  it++;
+  if (it->type() == tlv::NackPrefixLength) {
+    m_prefixLen = readNonNegativeInteger(*it);
+  }
+  else {
+    BOOST_THROW_EXCEPTION(ndn::tlv::Error("expecting prefix length block"));
+  }
+
+  it++;
+  if (it->type() == tlv::NackExpectedFakePerc) {
+    m_expectedFakePerc = readNonNegativeInteger(*it);
+  }
+  else {
+    BOOST_THROW_EXCEPTION(ndn::tlv::Error("expecting expected percentage block"));
+  }
+
+  it++;
+  while (it != it->elements_end()) {
+    Name fakeName(*it);
+    m_fakeInterestNames.push_back(fakeName);
   }
 
 }

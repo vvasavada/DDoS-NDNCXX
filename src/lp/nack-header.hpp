@@ -25,10 +25,11 @@
 #define NDN_CXX_LP_NACK_HEADER_HPP
 
 #include "../common.hpp"
+#include "../name.hpp"
 #include "../encoding/encoding-buffer.hpp"
 #include "../encoding/block-helpers.hpp"
-
 #include "tlv.hpp"
+#include <list>
 
 namespace ndn {
 namespace lp {
@@ -105,9 +106,22 @@ public: // reason
   NackHeader&
   setPrefixLen(uint64_t m_prefixLen);
 
-private:
+public:
   NackReason m_reason;
+
+  // specify the prefix
   uint64_t m_prefixLen;
+
+  // used for fake interest attack
+  // control the fake interest percentage to be less than m_expectedPerc
+  // range: 0 - 100
+  // e.g. if value is 5, the expected percentage is 5%
+  uint64_t m_expectedFakePerc;
+
+  // used for fake interest attack
+  // contains the list of fake interest name THAT ONLY AFTER THE PREFIX
+  std::list<Name> m_fakeInterestNames;
+
   mutable Block m_wire;
 };
 

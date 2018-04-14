@@ -39,6 +39,7 @@ enum {
   Nack = 800,
   NackReason = 801,
   NackPrefixLength = 802,
+  NackExpectedFakePerc = 803,
   NextHopFaceId = 816,
   IncomingFaceId = 817,
   CachePolicy = 820,
