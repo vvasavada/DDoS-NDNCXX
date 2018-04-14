@@ -71,6 +71,7 @@ isLessSevere(lp::NackReason x, lp::NackReason y)
 NackHeader::NackHeader()
   : m_reason(NackReason::NONE)
   , m_prefixLen(0)
+
 {
 }
 
@@ -135,7 +136,6 @@ NackHeader::wireDecode(const Block& wire)
   m_reason = NackReason::NONE;
   m_prefixLen = 0;
 
-
   if (m_wire.elements_size() <= 0) {
     BOOST_THROW_EXCEPTION(ndn::tlv::Error("expecting prefix length block"));
   }
@@ -182,6 +182,7 @@ NackHeader::getReason() const
   case NackReason::NO_ROUTE:
   case NackReason::VALID_INTEREST_OVERLOAD:
   case NackReason::FAKE_INTEREST_OVERLOAD:
+  case NackReason::HINT_CHANGE_NOTICE:
     return m_reason;
   default:
     return NackReason::NONE;
@@ -192,6 +193,34 @@ NackHeader&
 NackHeader::setReason(NackReason reason)
 {
   m_reason = reason;
+  m_wire.reset();
+  return *this;
+}
+
+std::list<Name>
+NackHeader::getFakeInterestNames() const
+{
+  return m_fakeInterestNames;
+}
+
+NackHeader&
+NackHeader::setFakeInterestNames(std::list<Name> m_fakeInterestNames)
+{
+  m_fakeInterestNames = m_fakeInterestNames;
+  m_wire.reset();
+  return *this;
+}
+
+uint64_t
+NackHeader::getExpFakePerc() const
+{
+  return m_expectedFakePerc;
+}
+
+NackHeader&
+NackHeader::setExpFakePerc(uint64_t expFakePerc)
+{
+  m_expectedFakePerc = expFakePerc;
   m_wire.reset();
   return *this;
 }

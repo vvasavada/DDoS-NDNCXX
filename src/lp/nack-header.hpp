@@ -93,6 +93,30 @@ public: // reason
   NackHeader&
   setReason(NackReason reason);
 
+  /**
+   * \return expected fake interest percentage
+   */
+  uint64_t getExpFakePerc() const;
+
+  /**
+   * \brief set expected fake interest percentage
+   * \param percentage
+   */
+  NackHeader&
+  setExpFakePerc(uint64_t expFakePerc);
+
+  /**
+   * \return list of fake interest names
+   */
+  std::list<Name> getFakeInterestNames() const;
+
+  /**
+   * \brief set fake interest names
+   * \param list of fake interest names
+   */
+  NackHeader&
+  setFakeInterestNames(std::list<Name> fakeInterestNames);
+
   uint64_t
   getPrefixLen() const;
 
