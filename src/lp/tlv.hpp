@@ -41,6 +41,7 @@ enum {
   NackPrefixLength = 802,
   NackFakeTolerance = 803,
   NackFakeNameList = 804,
+  NackFakeNameEntry = 805,
   NextHopFaceId = 816,
   IncomingFaceId = 817,
   CachePolicy = 820,

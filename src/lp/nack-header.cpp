@@ -73,6 +73,7 @@ NackHeader::NackHeader()
   : m_reason(NackReason::NONE)
   , m_prefixLen(0)
   , m_fakeTolerance(0)
+  , m_fakeInterestNames()
 {
 }
 
@@ -87,11 +88,13 @@ NackHeader::wireEncode(EncodingImpl<TAG>& encoder) const
 {
   size_t length = 0;
 
-  for (const auto& entry : m_fakeInterestNames) {
-    length += entry.wireEncode(encoder);
+  if (m_fakeInterestNames.size() > 0) {
+    for (auto it = m_fakeInterestNames.rbegin(); it != m_fakeInterestNames.rend(); it++) {
+      length += encoder.prependBlock(it->wireEncode());
+    }
+    length += encoder.prependVarNumber(length);
+    length += encoder.prependVarNumber(tlv::NackFakeNameList);
   }
-  length += encoder.prependVarNumber(length);
-  length += encoder.prependVarNumber(tlv::NackFakeNameList);
 
   length += prependNonNegativeIntegerBlock(encoder, tlv::NackFakeTolerance,
                                            m_fakeTolerance);
@@ -134,10 +137,12 @@ NackHeader::wireDecode(const Block& wire)
     BOOST_THROW_EXCEPTION(ndn::tlv::Error("expecting Nack block"));
   }
 
-  m_wire = wire;
-  m_wire.parse();
   m_reason = NackReason::NONE;
   m_prefixLen = 0;
+  m_fakeInterestNames.clear();
+
+  m_wire = wire;
+  m_wire.parse();
 
   if (m_wire.elements_size() <= 0) {
     BOOST_THROW_EXCEPTION(ndn::tlv::Error("expecting blocks"));
@@ -147,40 +152,40 @@ NackHeader::wireDecode(const Block& wire)
 
   if (it->type() == tlv::NackReason) {
     m_reason = static_cast<NackReason>(readNonNegativeInteger(*it));
+    it++;
   }
   else {
     BOOST_THROW_EXCEPTION(ndn::tlv::Error("expecting NackReason block"));
   }
 
-  it++;
   if (it->type() == tlv::NackPrefixLength) {
     m_prefixLen = readNonNegativeInteger(*it);
+    it++;
   }
   else {
     BOOST_THROW_EXCEPTION(ndn::tlv::Error("expecting prefix length block"));
   }
 
-  it++;
   if (it->type() == tlv::NackFakeTolerance) {
     m_fakeTolerance = readNonNegativeInteger(*it);
+    it++;
   }
   else {
     BOOST_THROW_EXCEPTION(ndn::tlv::Error("expecting fake tolerance block"));
   }
 
-  it++;
   if (it->type() == tlv::NackFakeNameList) {
     it->parse();
-    auto InnerIt = it->elements_begin();
-    while (InnerIt != it->elements_end()) {
-      Name fakeName(*InnerIt);
+    auto tempIt = it->elements_begin();
+    while (tempIt != it->elements_end() && tempIt->type() == ndn::tlv::Name) {
+      Name fakeName(*tempIt);
       m_fakeInterestNames.push_back(fakeName);
-      std::cout << fakeName << std::endl;
-      InnerIt++;
+      tempIt++;
     }
+    it++;
   }
   else {
-    BOOST_THROW_EXCEPTION(ndn::tlv::Error("expecting fake name list block"));
+    BOOST_THROW_EXCEPTION(ndn::tlv::Error("expecting NackFakeNameList block"));
   }
 }
 
