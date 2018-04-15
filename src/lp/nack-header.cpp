@@ -22,6 +22,7 @@
  */
 
 #include "nack-header.hpp"
+#include <iostream>
 
 namespace ndn {
 namespace lp {
@@ -89,6 +90,8 @@ NackHeader::wireEncode(EncodingImpl<TAG>& encoder) const
   for (const auto& entry : m_fakeInterestNames) {
     length += entry.wireEncode(encoder);
   }
+  length += encoder.prependVarNumber(length);
+  length += encoder.prependVarNumber(tlv::NackFakeNameList);
 
   length += prependNonNegativeIntegerBlock(encoder, tlv::NackFakeTolerance,
                                            m_fakeTolerance);
@@ -166,11 +169,19 @@ NackHeader::wireDecode(const Block& wire)
   }
 
   it++;
-  while (it != it->elements_end()) {
-    Name fakeName(*it);
-    m_fakeInterestNames.push_back(fakeName);
+  if (it->type() == tlv::NackFakeNameList) {
+    it->parse();
+    auto InnerIt = it->elements_begin();
+    while (InnerIt != it->elements_end()) {
+      Name fakeName(*InnerIt);
+      m_fakeInterestNames.push_back(fakeName);
+      std::cout << fakeName << std::endl;
+      InnerIt++;
+    }
   }
-
+  else {
+    BOOST_THROW_EXCEPTION(ndn::tlv::Error("expecting fake name list block"));
+  }
 }
 
 NackReason
