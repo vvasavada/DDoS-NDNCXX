@@ -73,6 +73,7 @@ NackHeader::NackHeader()
   : m_reason(NackReason::NONE)
   , m_prefixLen(0)
   , m_fakeTolerance(0)
+  , m_timer(0)
   , m_fakeInterestNames()
 {
 }
@@ -95,6 +96,9 @@ NackHeader::wireEncode(EncodingImpl<TAG>& encoder) const
     length += encoder.prependVarNumber(length);
     length += encoder.prependVarNumber(tlv::NackFakeNameList);
   }
+
+  length += prependNonNegativeIntegerBlock(encoder, tlv::NackTimer,
+                                           m_timer);
 
   length += prependNonNegativeIntegerBlock(encoder, tlv::NackFakeTolerance,
                                            m_fakeTolerance);
@@ -172,6 +176,13 @@ NackHeader::wireDecode(const Block& wire)
   }
   else {
     BOOST_THROW_EXCEPTION(ndn::tlv::Error("expecting fake tolerance block"));
+  }
+
+  if (it->type() == tlv::NackTimer) {
+    m_timer = readNonNegativeInteger(*it);
+    it++;
+  } else {
+    BOOST_THROW_EXCEPTION(ndn::tlv::Error("expecting timer block"));
   }
 
   if (it->type() == tlv::NackFakeNameList) {

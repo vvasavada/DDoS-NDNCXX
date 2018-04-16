@@ -105,6 +105,10 @@ public:
   uint64_t m_fakeTolerance;
 
   // used for fake interest attack
+  // contains time until which routers maintains DDoS_ATTACK state
+  uint64_t m_timer;
+
+  // used for fake interest attack
   // contains the list of fake interest name THAT ONLY AFTER THE PREFIX
   std::list<Name> m_fakeInterestNames;
 
