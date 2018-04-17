@@ -42,7 +42,7 @@ enum {
   NackFakeTolerance = 803,
   NackTimer = 804,
   NackFakeNameList = 805,
-  NackFakeNameEntry = 806,
+  NackFakeNameFilter = 806,
   NextHopFaceId = 816,
   IncomingFaceId = 817,
   CachePolicy = 820,

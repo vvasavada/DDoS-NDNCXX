@@ -112,6 +112,8 @@ public:
   // contains the list of fake interest name THAT ONLY AFTER THE PREFIX
   std::list<Name> m_fakeInterestNames;
 
+  Buffer m_bloomfilter;
+
   mutable Block m_wire;
 };
 
