@@ -96,6 +96,9 @@ public: // reason
 public:
   NackReason m_reason;
 
+  // specify the unique nack id
+  uint64_t m_nackId;
+
   // specify the prefix
   uint64_t m_prefixLen;
 

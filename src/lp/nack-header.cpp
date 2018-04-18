@@ -71,6 +71,7 @@ isLessSevere(lp::NackReason x, lp::NackReason y)
 
 NackHeader::NackHeader()
   : m_reason(NackReason::NONE)
+  , m_nackId(0)
   , m_prefixLen(0)
   , m_fakeTolerance(0)
   , m_timer(0)
@@ -108,6 +109,9 @@ NackHeader::wireEncode(EncodingImpl<TAG>& encoder) const
 
   length += prependNonNegativeIntegerBlock(encoder, tlv::NackPrefixLength,
                                            m_prefixLen);
+
+  length += prependNonNegativeIntegerBlock(encoder, tlv::NackId,
+                                           m_nackId);
 
   length += prependNonNegativeIntegerBlock(encoder, tlv::NackReason,
                                            static_cast<uint32_t>(m_reason));
@@ -163,6 +167,14 @@ NackHeader::wireDecode(const Block& wire)
   }
   else {
     BOOST_THROW_EXCEPTION(ndn::tlv::Error("expecting NackReason block"));
+  }
+
+  if (it->type() == tlv::NackId) {
+    m_nackId = readNonNegativeInteger(*it);
+    it++;
+  }
+  else {
+    BOOST_THROW_EXCEPTION(ndn::tlv::Error("expecting Nack ID block"));
   }
 
   if (it->type() == tlv::NackPrefixLength) {
