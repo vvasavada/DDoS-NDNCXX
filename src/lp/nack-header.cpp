@@ -89,13 +89,11 @@ NackHeader::wireEncode(EncodingImpl<TAG>& encoder) const
 {
   size_t length = 0;
 
-  if (m_fakeInterestNames.size() > 0) {
-    for (auto it = m_fakeInterestNames.rbegin(); it != m_fakeInterestNames.rend(); it++) {
-      length += encoder.prependBlock(it->wireEncode());
-    }
-    length += encoder.prependVarNumber(length);
-    length += encoder.prependVarNumber(tlv::NackFakeNameList);
+  for (auto it = m_fakeInterestNames.rbegin(); it != m_fakeInterestNames.rend(); it++) {
+    length += encoder.prependBlock(it->wireEncode());
   }
+  length += encoder.prependVarNumber(length);
+  length += encoder.prependVarNumber(tlv::NackFakeNameList);
 
   length += encoder.prependByteArrayBlock(tlv::NackFakeNameFilter,
                                           m_bloomfilter.data(), m_bloomfilter.size());
