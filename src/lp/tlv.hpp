@@ -40,7 +40,7 @@ enum {
   NackReason = 801,
   NackId = 802,
   NackPrefixLength = 803,
-  NackFakeTolerance = 804,
+  NackTolerance = 804,
   NackTimer = 805,
   NackFakeNameList = 806,
   NackFakeNameFilter = 807,

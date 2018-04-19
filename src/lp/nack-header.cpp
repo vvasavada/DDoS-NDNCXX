@@ -73,7 +73,7 @@ NackHeader::NackHeader()
   : m_reason(NackReason::NONE)
   , m_nackId(0)
   , m_prefixLen(0)
-  , m_fakeTolerance(0)
+  , m_tolerance(0)
   , m_timer(0)
   , m_fakeInterestNames()
 {
@@ -104,8 +104,8 @@ NackHeader::wireEncode(EncodingImpl<TAG>& encoder) const
   length += prependNonNegativeIntegerBlock(encoder, tlv::NackTimer,
                                            m_timer);
 
-  length += prependNonNegativeIntegerBlock(encoder, tlv::NackFakeTolerance,
-                                           m_fakeTolerance);
+  length += prependNonNegativeIntegerBlock(encoder, tlv::NackTolerance,
+                                           m_tolerance);
 
   length += prependNonNegativeIntegerBlock(encoder, tlv::NackPrefixLength,
                                            m_prefixLen);
@@ -185,12 +185,12 @@ NackHeader::wireDecode(const Block& wire)
     BOOST_THROW_EXCEPTION(ndn::tlv::Error("expecting prefix length block"));
   }
 
-  if (it->type() == tlv::NackFakeTolerance) {
-    m_fakeTolerance = readNonNegativeInteger(*it);
+  if (it->type() == tlv::NackTolerance) {
+    m_tolerance = readNonNegativeInteger(*it);
     it++;
   }
   else {
-    BOOST_THROW_EXCEPTION(ndn::tlv::Error("expecting fake tolerance block"));
+    BOOST_THROW_EXCEPTION(ndn::tlv::Error("expecting tolerance block"));
   }
 
   if (it->type() == tlv::NackTimer) {

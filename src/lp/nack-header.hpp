@@ -102,10 +102,10 @@ public:
   // specify the prefix
   uint64_t m_prefixLen;
 
-  // used for fake interest attack
-  // control the fake interest percentage to be less than m_fakeTolerance
-  // e.g. if value is 50, the tolerance is 50 fake interest per second
-  uint64_t m_fakeTolerance;
+  // used for interest
+  // control the interest percentage to be less than m_tolerance
+  // e.g. if value is 50, the tolerance is 50 interest per second
+  uint64_t m_tolerance;
 
   // used for fake interest attack
   // contains time until which routers maintains DDoS_ATTACK state
