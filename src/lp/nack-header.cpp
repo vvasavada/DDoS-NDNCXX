@@ -89,8 +89,10 @@ NackHeader::wireEncode(EncodingImpl<TAG>& encoder) const
 {
   size_t length = 0;
 
-  for (auto it = m_fakeInterestNames.rbegin(); it != m_fakeInterestNames.rend(); it++) {
-    length += encoder.prependBlock(it->wireEncode());
+  if (m_fakeInterestNames.size() > 0) {
+    for (auto it = m_fakeInterestNames.rbegin(); it != m_fakeInterestNames.rend(); it++) {
+      length += encoder.prependBlock(it->wireEncode());
+    }
   }
   length += encoder.prependVarNumber(length);
   length += encoder.prependVarNumber(tlv::NackFakeNameList);
@@ -184,22 +186,16 @@ NackHeader::wireDecode(const Block& wire)
     BOOST_THROW_EXCEPTION(ndn::tlv::Error("expecting tolerance block"));
   }
 
-  // if (it->type() == tlv::NackFakeNameFilter) {
-  //   m_bloomfilter = Buffer(it->value(), it->value_size());
-  //   it++;
-  // } else {
-  //   BOOST_THROW_EXCEPTION(ndn::tlv::Error("expecting nack name filter block"));
-  // }
-
   if (it->type() == tlv::NackFakeNameList) {
     it->parse();
-    auto tempIt = it->elements_begin();
-    while (tempIt != it->elements_end() && tempIt->type() == ndn::tlv::Name) {
-      Name fakeName(*tempIt);
-      m_fakeInterestNames.push_back(fakeName);
-      tempIt++;
+    if (it->elements_size() != 0) {
+      auto tempIt = it->elements_begin();
+      while (tempIt != it->elements_end() && tempIt->type() == ndn::tlv::Name) {
+        Name fakeName(*tempIt);
+        m_fakeInterestNames.push_back(fakeName);
+        tempIt++;
+      }
     }
-    it++;
   }
   else {
     BOOST_THROW_EXCEPTION(ndn::tlv::Error("expecting NackFakeNameList block"));
