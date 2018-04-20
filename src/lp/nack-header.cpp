@@ -95,9 +95,6 @@ NackHeader::wireEncode(EncodingImpl<TAG>& encoder) const
   length += encoder.prependVarNumber(length);
   length += encoder.prependVarNumber(tlv::NackFakeNameList);
 
-  length += encoder.prependByteArrayBlock(tlv::NackFakeNameFilter,
-                                          m_bloomfilter.data(), m_bloomfilter.size());
-
   length += prependNonNegativeIntegerBlock(encoder, tlv::NackTolerance,
                                            m_tolerance);
 
@@ -187,12 +184,12 @@ NackHeader::wireDecode(const Block& wire)
     BOOST_THROW_EXCEPTION(ndn::tlv::Error("expecting tolerance block"));
   }
 
-  if (it->type() == tlv::NackFakeNameFilter) {
-    m_bloomfilter = Buffer(it->value(), it->value_size());
-    it++;
-  } else {
-    BOOST_THROW_EXCEPTION(ndn::tlv::Error("expecting nack name filter block"));
-  }
+  // if (it->type() == tlv::NackFakeNameFilter) {
+  //   m_bloomfilter = Buffer(it->value(), it->value_size());
+  //   it++;
+  // } else {
+  //   BOOST_THROW_EXCEPTION(ndn::tlv::Error("expecting nack name filter block"));
+  // }
 
   if (it->type() == tlv::NackFakeNameList) {
     it->parse();
