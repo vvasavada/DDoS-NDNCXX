@@ -49,6 +49,9 @@ operator<<(std::ostream& os, NackReason reason)
   case NackReason::DDOS_HINT_CHANGE_NOTICE:
     os << "Forwarding Hint Change Notice";
     break;
+  case NackReason::DDOS_RESET_RATE:
+    os << "Reset the sending rate to origin speed";
+    break;
   default:
     os << "None";
     break;
@@ -212,6 +215,7 @@ NackHeader::getReason() const
   case NackReason::DDOS_VALID_INTEREST_OVERLOAD:
   case NackReason::DDOS_FAKE_INTEREST:
   case NackReason::DDOS_HINT_CHANGE_NOTICE:
+  case NackReason::DDOS_RESET_RATE:
     return m_reason;
   default:
     return NackReason::NONE;
