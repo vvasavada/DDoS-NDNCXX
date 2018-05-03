@@ -173,9 +173,9 @@ Block::fromStream(std::istream& is)
   }
 
   size_t tlSize = tlv::sizeOfVarNumber(type) + tlv::sizeOfVarNumber(length);
-  if (tlSize + length > MAX_SIZE_OF_BLOCK_FROM_STREAM) {
-    BOOST_THROW_EXCEPTION(Error("TLV-LENGTH from stream exceeds limit"));
-  }
+  // if (tlSize + length > MAX_SIZE_OF_BLOCK_FROM_STREAM) {
+  //   BOOST_THROW_EXCEPTION(Error("TLV-LENGTH from stream exceeds limit"));
+  // }
 
   EncodingBuffer eb(tlSize + length, length);
   uint8_t* valueBuf = eb.buf();
