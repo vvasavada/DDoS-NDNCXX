@@ -52,6 +52,9 @@ operator<<(std::ostream& os, NackReason reason)
   case NackReason::DDOS_RESET_RATE:
     os << "Reset the sending rate to origin speed";
     break;
+  case NackReason::DDOS_REPORT_VALID:
+    os << "Report valid customer number";
+    break;
   default:
     os << "None";
     break;
@@ -216,6 +219,7 @@ NackHeader::getReason() const
   case NackReason::DDOS_FAKE_INTEREST:
   case NackReason::DDOS_HINT_CHANGE_NOTICE:
   case NackReason::DDOS_RESET_RATE:
+  case NackReason::DDOS_REPORT_VALID:
     return m_reason;
   default:
     return NackReason::NONE;
